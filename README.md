@@ -42,7 +42,7 @@ python webGender.py
 
 # About the project
 
-##models from
+## models from
 >https://github.com/davisking/dlib
 https://github.com/oarriaga/face_classification
 

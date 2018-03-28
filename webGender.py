@@ -25,13 +25,14 @@ def hello():
 @app.route("/url",methods=["POST"])
 def remote():
     url = request.values.get("url",0)
+    print("raw url:" + url + "\n")
     if url == "":
         return toJSON(err="no url")
     randstr = uuid.uuid1().hex
     filename = "./tmp/"+randstr
     try:
-        url = parse.unquote(url) 
-        print(url)
+      #  url = parse.unquote(url) 
+      #  print(url)
         req.urlretrieve(url,filename)
         faces = detector(filename)
         if len(faces) >0:

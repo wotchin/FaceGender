@@ -15,6 +15,7 @@ def get_face_detector(detect_model,sp_model):
     sp = dlib.shape_predictor(sp_model)
     def inner(path):
         raw_img = cv2.imread(path) #bgr
+        raw_img = resize_image(raw_img,320,320)
         rgb_img = cv2.cvtColor(raw_img,cv2.COLOR_BGR2RGB)
         dets = cnn_face_detector(rgb_img, 1)
         ret = []

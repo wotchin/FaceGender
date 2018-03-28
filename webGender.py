@@ -3,6 +3,7 @@ from flask import request
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = "0" 
 import urllib.request as req
+import urllib.parse as parse
 import uuid
 from gender import get_face_detector,get_gender_classifier
 from time import time
@@ -24,11 +25,13 @@ def hello():
 @app.route("/url",methods=["POST"])
 def remote():
     url = request.values.get("url",0)
-    if url is "":
-        return "no url"
+    if url == "":
+        return toJSON(err="no url")
     randstr = uuid.uuid1().hex
     filename = "./tmp/"+randstr
     try:
+        url = parse.unquote(url) 
+        print(url)
         req.urlretrieve(url,filename)
         faces = detector(filename)
         if len(faces) >0:
@@ -39,7 +42,8 @@ def remote():
             os.remove(filename)
             return toJSON(err = "no faces") 
     except Exception as e:
-        return toJSON(err = str(e)) 
+        #raise(e)
+        return toJSON(err = repr(e)) 
 
 @app.route("/post",methods=["POST"])
 def post():
@@ -64,7 +68,7 @@ def test():
     '''
     <form action="post" method="post" enctype="multipart/form-data" name="upload_form">
   <label>choose file</label>
- <input name="img" type="file" accept="image/gif, image/jpeg"/>
+ <input name="img" type="file" accept="*"/>
  <input name="upload" type="submit" value="upload" />
 </form>
 </body>

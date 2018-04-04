@@ -1,8 +1,10 @@
 # FaceGender
 FaceGender SaaS:
 Judge the gender of face picture online with deep-learning.
-Implement this model with Keras,dlib(>=19.9).
-:)
+
+Implement this model with Keras,dlib(>=19.9) 
+
+Have fun :)
 
 # How to use
 ## Install python env.
@@ -47,6 +49,7 @@ python webGender.py
 
 ## models from
 >https://github.com/davisking/dlib
+
 https://github.com/oarriaga/face_classification
 
 ## At the end

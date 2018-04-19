@@ -5,17 +5,19 @@ os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 import urllib.request as req
 import urllib.parse as parse
 import uuid
-from gender import get_face_detector,get_gender_classifier
+from gender2 import get_face_detector,get_gender_classifier
 from time import time
 import json
 
 app = Flask(__name__)
-
+THRESHOLD = 0.6
 detector = get_face_detector("./trained_models/face/mmod_human_face_detector.dat","./trained_models/face/shape_predictor_68_face_landmarks.dat")
-classifier = get_gender_classifier("./trained_models/gender/simple_CNN.81-0.96.hdf5")
+classifier = get_gender_classifier("./trained_models/gender/alex.hdf5")
 
-def toJSON(gender = 3,err = ""):
+def toJSON(gender = 3,err = "",vector = None):
     j = {"gender":str(1 - gender),"err":err} 
+    if vector != None:
+        j["vector"] = vector
     return json.dumps(j)
        
 @app.route("/")
@@ -36,9 +38,14 @@ def remote():
         req.urlretrieve(url,filename)
         faces = detector(filename)
         if len(faces) >0:
-            gender = classifier(faces[0])
+            vector = classifier(faces[0])[0].tolist()
+            gender = vector[1]
+            if gender > THRESHOLD:
+                gender = 1 #male
+            else:
+                gender =0 #female
             os.remove(filename)
-            return toJSON(gender=gender) 
+            return toJSON(gender=gender,vector=vector) 
         else:
             os.remove(filename)
             return toJSON(err = "no faces") 
@@ -55,10 +62,15 @@ def post():
     last = time()
     faces = detector(filename)
     if len(faces) > 0:
-        gender = classifier(faces[0])
-        print("cost:" + str(time() - last))
+        vector = classifier(faces[0])[0].tolist()
+        gender = vector[1]
+        if gender > THRESHOLD:
+            gender = 1 #male
+        else:
+            gender = 0 #female
         os.remove(filename)
-        return toJSON(gender=gender) 
+        print(time() - last)
+        return toJSON(gender=gender,vector=vector) 
     else:
         os.remove(filename)
         return toJSON(err="no faces") 

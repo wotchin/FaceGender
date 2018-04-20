@@ -14,16 +14,16 @@ MALE_THRESHOLD = 0.62
 FEMALE_THRESHOLD = 0.36
 detector = get_face_detector("./trained_models/face/mmod_human_face_detector.dat","./trained_models/face/shape_predictor_68_face_landmarks.dat")
 classifier = get_gender_classifier("./trained_models/gender/alex.hdf5")
-
-def toJSON(gender = -2,err = "",vector = None):
-    j = {"gender":str(1 - gender),"err":err} 
+#alexNet is not uploaded to github,please using 'SimpleCNN'
+def toJSON(gender = 3,err = "",vector = None):
+    j = {"gender":str(gender),"err":err} 
     if vector != None:
         j["vector"] = vector
     return json.dumps(j)
        
 @app.route("/")
 def hello():
-    return "Hello FaceGender!"
+    return "Hello FaceGender!<br> please VISIT <b>/test</b> "
 
 @app.route("/url",methods=["POST"])
 def remote():
@@ -42,11 +42,11 @@ def remote():
             vector = classifier(faces[0])[0].tolist()
             gender = vector[1]
             if gender > MALE_THRESHOLD:
-                gender = 1 #male
+                gender = 0 #male
             elif gender < FEMALE_THRESHOLD:
-                gender =0 #female
+                gender = 1 #female
             else:
-                gender = -2 #unknown
+                gender = 3 #unknown
             os.remove(filename)
             return toJSON(gender=gender,vector=vector) 
         else:
@@ -67,12 +67,12 @@ def post():
     if len(faces) > 0:
         vector = classifier(faces[0])[0].tolist()
         gender = vector[1]
-	if gender > MALE_THRESHOLD:
-	    gender = 1 #male
-	elif gender < FEMALE_THRESHOLD:
-	    gender =0 #female
-	else:
-	    gender = -2 #unknown
+        if gender > MALE_THRESHOLD:
+            gender = 0 #male
+        elif gender < FEMALE_THRESHOLD:
+            gender = 1#female
+        else:
+            gender = 3 #unknown
         os.remove(filename)
         print(time() - last)
         return toJSON(gender=gender,vector=vector) 
